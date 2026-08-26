@@ -671,31 +671,56 @@ either_copyin(void *dst, int user_src, uint64 src, uint64 len)
 // Print a process listing to console.  For debugging.
 // Runs when user types ^P on console.
 // No lock to avoid wedging a stuck machine further.
+// Return the depth of a process in the process hierarchy.
+static int
+procdepth(struct proc *p)
+{
+  int depth = 0;
+
+  while (p->parent != 0 && depth < NPROC) {
+    depth++;
+    p = p->parent;
+  }
+
+  return depth;
+}
+
 void
 procdump(void)
 {
   static char *states[] = {
-    // clang-format off
     [UNUSED]    "unused",
     [USED]      "used",
     [SLEEPING]  "sleep ",
     [RUNNABLE]  "runble",
     [RUNNING]   "run   ",
     [ZOMBIE]    "zombie"
-    // clang-format on
   };
+
   struct proc *p;
   char *state;
+  int depth;
 
-  printk("\n");
+  printk("\n=== PROCESS TREE ===\n");
+
   for (p = proc; p < &proc[NPROC]; p++) {
     if (p->state == UNUSED)
       continue;
+
     if (p->state >= 0 && p->state < NELEM(states) && states[p->state])
       state = states[p->state];
     else
       state = "???";
-    printk("%d %s %s", p->pid, state, p->name);
-    printk("\n");
+
+    depth = procdepth(p);
+
+    for (int i = 0; i < depth; i++)
+      printk("  ");
+
+    if (depth > 0)
+      printk("|- ");
+
+    printk("PID=%d STATE=%s NAME=%s\n",
+           p->pid, state, p->name);
   }
 }
