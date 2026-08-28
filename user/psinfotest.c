@@ -4,10 +4,11 @@
 int
 main(void)
 {
-  int pid1, pid2;
+  int pid1, pid2, pid3;
 
   printf("=== Process Hierarchy Test ===\n");
 
+  // Create child
   pid1 = fork();
 
   if (pid1 < 0) {
@@ -16,9 +17,10 @@ main(void)
   }
 
   if (pid1 == 0) {
-    // Child process
+    // Child
     printf("Child created: PID=%d\n", getpid());
 
+    // Create grandchild
     pid2 = fork();
 
     if (pid2 < 0) {
@@ -27,25 +29,43 @@ main(void)
     }
 
     if (pid2 == 0) {
-      // Grandchild process
+      // Grandchild
       printf("Grandchild created: PID=%d\n", getpid());
 
-      // Keep grandchild alive so psinfo() can see it.
+      // Create great-grandchild
+      pid3 = fork();
+
+      if (pid3 < 0) {
+        printf("great-grandchild fork failed\n");
+        exit(1);
+      }
+
+      if (pid3 == 0) {
+        // Great-grandchild
+        printf("Great-grandchild created: PID=%d\n", getpid());
+
+        // Keep it alive so psinfo() can see it.
+        pause(20);
+        exit(0);
+      }
+
+      // Keep grandchild alive.
       pause(20);
+      wait(0);
       exit(0);
     }
 
-    // Keep child alive so psinfo() can see it.
+    // Keep child alive.
     pause(20);
     wait(0);
     exit(0);
   }
 
-  // Original parent process
+  // Original parent
   printf("Parent: PID=%d, Child=%d\n", getpid(), pid1);
 
-  // Give child and grandchild time to be created.
-  pause(2);
+  // Give all descendants time to be created.
+  pause(3);
 
   printf("\nCalling psinfo()...\n");
   psinfo();
