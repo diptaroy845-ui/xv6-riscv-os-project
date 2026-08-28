@@ -703,9 +703,15 @@ procdump(void)
 
   printk("\n=== PROCESS TREE ===\n");
 
+  acquire(&wait_lock);
+
   for (p = proc; p < &proc[NPROC]; p++) {
-    if (p->state == UNUSED)
+    acquire(&p->lock);
+
+    if (p->state == UNUSED) {
+      release(&p->lock);
       continue;
+    }
 
     if (p->state >= 0 && p->state < NELEM(states) && states[p->state])
       state = states[p->state];
@@ -722,7 +728,11 @@ procdump(void)
 
     printk("PID=%d STATE=%s NAME=%s SIZE=%ld bytes\n",
            p->pid, state, p->name, p->sz);
+
+    release(&p->lock);
   }
+
+  release(&wait_lock);
 }
 
 void
