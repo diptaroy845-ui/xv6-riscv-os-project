@@ -137,5 +137,7 @@ sys_meminfo(void)
        (used * 1000) / total / 10,
        (used * 1000) / total % 10);
 
+  procmeminfo();
+
   return 0;
 }

@@ -724,3 +724,22 @@ procdump(void)
            p->pid, state, p->name, p->sz);
   }
 }
+
+void
+procmeminfo(void)
+{
+  struct proc *p;
+
+  printk("\n=== PROCESS MEMORY ===\n");
+
+  for (p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+
+    if (p->state != UNUSED) {
+      printk("PID=%d NAME=%s MEMORY=%ld bytes\n",
+             p->pid, p->name, p->sz);
+    }
+
+    release(&p->lock);
+  }
+}
