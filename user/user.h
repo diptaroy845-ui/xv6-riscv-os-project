@@ -4,6 +4,7 @@ struct stat;
 
 // system calls
 int psinfo(void);
+int meminfo(void);
 int fork(void);
 int exit(int) __attribute__((noreturn));
 int wait(int *);

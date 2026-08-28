@@ -82,6 +82,7 @@ argstr(int n, char *buf, int max)
 
 // Prototypes for the functions that handle system calls.
 extern uint64 sys_psinfo(void);
+extern uint64 sys_meminfo(void);
 extern uint64 sys_fork(void);
 extern uint64 sys_exit(void);
 extern uint64 sys_wait(void);
@@ -132,6 +133,7 @@ static uint64 (*syscalls[])(void) = {
   [SYS_close]   sys_close,
   [SYS_sync]    sys_sync,
   [SYS_psinfo] sys_psinfo,
+  [SYS_meminfo] sys_meminfo,
   // clang-format on
 };
 

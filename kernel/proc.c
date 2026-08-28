@@ -720,7 +720,7 @@ procdump(void)
     if (depth > 0)
       printk("|- ");
 
-    printk("PID=%d STATE=%s NAME=%s\n",
-           p->pid, state, p->name);
+    printk("PID=%d STATE=%s NAME=%s SIZE=%ld bytes\n",
+           p->pid, state, p->name, p->sz);
   }
 }

@@ -7,6 +7,8 @@
 #include "proc.h"
 #include "vm.h"
 
+extern char end[];
+
 uint64
 sys_exit(void)
 {
@@ -114,5 +116,26 @@ uint64
 sys_psinfo(void)
 {
   procdump();
+  return 0;
+}
+
+uint64
+sys_meminfo(void)
+{
+  uint64 free;
+  uint64 total;
+  uint64 used;
+
+  total = PHYSTOP - PGROUNDUP((uint64)end);
+  free = kfreepages() * PGSIZE;
+  used = total - free;
+
+  printk("Total Physical Memory: %ld bytes\n", total);
+  printk("Used Memory: %ld bytes\n", used);
+  printk("Free Memory: %ld bytes\n", free);
+  printk("Memory Utilization: %ld.%ld%%\n",
+       (used * 1000) / total / 10,
+       (used * 1000) / total % 10);
+
   return 0;
 }
